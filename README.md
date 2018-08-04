@@ -3,7 +3,7 @@ This is not a full on automatic music transcriber, it is simply an audio player 
 
 Right now it is able play and loop through different sections of a song.
 
-##TODO: 
+## TODO: 
 * Open file while song is still playing (background thread)
 * Implement home and end functionality.
 * Implement time-stretching and pitch shifting.
