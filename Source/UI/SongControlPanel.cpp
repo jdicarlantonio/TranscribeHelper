@@ -44,17 +44,8 @@ SongControlPanel::~SongControlPanel()
 
 void SongControlPanel::paint (Graphics& g)
 {
-	/* This demo code just fills the component's background and
-	   draws some placeholder text to get you started.
-
-	   You should replace everything in this method with your own
-	   drawing code..
-	*/
-//	g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
-
-//	g.setColour (Colours::grey);
-//	g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
+	// I'm not sure if I'm doing this right but it works...
+	
 	Path stopShape;
 	Path playShape;
 	Path pauseShape;
