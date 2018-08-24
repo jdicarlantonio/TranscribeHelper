@@ -1,9 +1,10 @@
 # TranscribeHelper
-This is not a full on automatic music transcriber, it is simply an audio player with some features (so far just time-stretching, pitch shifting, and looping is on the agenda). I am making this as a way to help me with transcribing guitar parts and gaining a better ear.
+This is not a full on automatic music transcriber, it is simply an audio player with some features (so far just time-stretching, pitch shifting, and looping is on the agenda). Built using the JUCE framework (https://juce.com/discover).
 
-Right now it is able play and loop through different sections of a song.
+Current Functionality:
+  Just plays and loops different sections of a song. Just implemented the ability to add 3rd party plugins, however, right now there is no plugin window and you are unable to remove plugins.
 
 ## TODO: 
-* Open file while song is still playing (background thread)
 * Implement home and end functionality.
-* Implement time-stretching and pitch shifting.
+* Get the AudioProcessorGraph fully working (add ability to remove plugins and get a plugin window to display plugin GUI)
+* Implement built in plugins: time-stretching/pitch-shifting (I am undecided between a phase vocoder or granular synthesis for this) and equalizer.
