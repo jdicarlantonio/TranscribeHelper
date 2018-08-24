@@ -27,6 +27,7 @@ public:
 	void resized() override;
 
 	void disableButtons(String state);
+	double getGain() { return gainSlider.getValue(); }
 
 private:
 	ShapeButton stopButton;
@@ -34,6 +35,8 @@ private:
 	ShapeButton pauseButton;
 	ShapeButton homeButton; // place cursor to beginning of track
 	ShapeButton endButton;  // place cursor to end of track
+
+	Slider gainSlider;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SongControlPanel)
 };

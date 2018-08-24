@@ -31,11 +31,19 @@ SongControlPanel::SongControlPanel()
 	addAndMakeVisible(homeButton);
 	addAndMakeVisible(endButton);
 
+	addAndMakeVisible(gainSlider);
+	gainSlider.setSliderStyle(Slider::LinearBarVertical);
+	gainSlider.setColour(Slider::textBoxTextColourId, Colours::grey);
+	gainSlider.setTextValueSuffix("dB");
+	gainSlider.setNormalisableRange(NormalisableRange<double>(-40.0, 10.0, 0.1));
+	gainSlider.setValue(0.0);
+
 	playButton.onClick = [this] { sendActionMessage("play"); };
 	stopButton.onClick = [this] { sendActionMessage("stop"); };
 	pauseButton.onClick = [this] { sendActionMessage("pause"); };
 	homeButton.onClick = [this] {sendActionMessage("home"); };
 	endButton.onClick = [this] {sendActionMessage("end"); };
+	gainSlider.onValueChange = [this] {sendActionMessage("gain"); };
 }
 
 SongControlPanel::~SongControlPanel()
@@ -119,6 +127,7 @@ void SongControlPanel::resized()
 	auto panelX = getLocalBounds().getX();
 	auto panelY = getLocalBounds().getY();
 	auto buttonSize = getLocalBounds().getHeight();
+	auto panelWidth = getLocalBounds().getWidth();
 
 	stopButton.setBounds(
 		panelX,
@@ -153,6 +162,16 @@ void SongControlPanel::resized()
 		panelY,
 		buttonSize,
 		buttonSize * 0.75f
+	);
+
+	auto sliderWidth = panelWidth / 16;
+	auto sliderHeight = buttonSize;
+
+	gainSlider.setBounds(
+		panelWidth - sliderWidth,
+		panelY,
+		sliderWidth,
+		sliderHeight
 	);
 }
 

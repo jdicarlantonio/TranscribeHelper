@@ -1,11 +1,9 @@
 /*
-  ==============================================================================
-
-    TrackThumbnail.h
-    Created: 2 Aug 2018 3:35:33am
-    Author:  jd
-
-  ==============================================================================
+==============================================================================
+TrackThumbnail.h
+Created: 2 Aug 2018 3:35:33am
+Author:  jd
+==============================================================================
 */
 
 #pragma once
@@ -15,20 +13,20 @@
 //==============================================================================
 /*
 */
-class TrackThumbnail    
+class TrackThumbnail
 	: public Component
 	, public ChangeListener
 {
 public:
-    TrackThumbnail(
+	TrackThumbnail(
 		int sourceSamplesPerThumbnailSamples,
 		AudioFormatManager& formatManager,
 		AudioThumbnailCache& cache
 	);
-    ~TrackThumbnail();
+	~TrackThumbnail();
 
-    void paint (Graphics&) override;
-    void resized() override;
+	void paint(Graphics&) override;
+	void resized() override;
 
 	void setFile(const File& file);
 	void paintWithoutFile(Graphics& g); // no file loaded
@@ -41,5 +39,5 @@ private:
 
 	AudioThumbnail thumbnail;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackThumbnail)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackThumbnail)
 };

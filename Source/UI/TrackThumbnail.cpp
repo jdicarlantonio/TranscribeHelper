@@ -1,11 +1,9 @@
 /*
-  ==============================================================================
-
-    TrackThumbnail.cpp
-    Created: 2 Aug 2018 3:35:33am
-    Author:  jd
-
-  ==============================================================================
+==============================================================================
+TrackThumbnail.cpp
+Created: 2 Aug 2018 3:35:33am
+Author:  jd
+==============================================================================
 */
 
 #include "../../JuceLibraryCode/JuceHeader.h"
@@ -26,13 +24,13 @@ TrackThumbnail::~TrackThumbnail()
 {
 }
 
-void TrackThumbnail::paint (Graphics& g)
+void TrackThumbnail::paint(Graphics& g)
 {
-	if(thumbnail.getNumChannels() == 0)
+	if (thumbnail.getNumChannels() == 0)
 	{
 		paintWithoutFile(g);
 	}
-	else 
+	else
 	{
 		paintWithFile(g);
 	}
@@ -66,7 +64,7 @@ void TrackThumbnail::paintWithFile(Graphics& g)
 
 void TrackThumbnail::changeListenerCallback(ChangeBroadcaster* source)
 {
-	if(source == &thumbnail)
+	if (source == &thumbnail)
 	{
 		thumbnailChanged();
 	}

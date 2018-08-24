@@ -25,8 +25,6 @@ public:
     //==============================================================================
     void initialise (const String& commandLine) override
     {
-        // This method is where you should put your application's initialisation code..
-
         mainWindow.reset (new MainWindow (getApplicationName()));
     }
 
@@ -90,6 +88,7 @@ public:
         */
 
     private:
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
     };
 
