@@ -25,19 +25,22 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
+	int numChoices() { return choices.size(); }
+
 private:
 	std::array<ComboBox, totalPluginsAllowed> pluginSlots;
 	std::array<Label, totalPluginsAllowed> slotLabels;
 
 	// currently only one choice while i work on some built in effects
 	// those being time stretch, pitch shift, and EQ
-	StringArray choices = {
-		"Add 3rd Party...", 
-		"Equalizer",
-		"Time Stretch",
-		"Pitch Shift",
+	const StringArray choices = {
+		"Add 3rd Party...",
+		"EQ",
+		"Phase Vocoder",
 		"None"
 	};
+
+public:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginPanel)
 };

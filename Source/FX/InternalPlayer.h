@@ -12,7 +12,7 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 
-#include "../ProcessorBase.h"
+#include "ProcessorBase.h"
 
 // Internal plugin to play an audio file
 class InternalPlayer

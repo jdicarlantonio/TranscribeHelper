@@ -2,7 +2,7 @@
   ==============================================================================
 
     ProcessorBase.h
-    Created: 13 Aug 2018 4:35:44pm
+    Created: 5 Sep 2018 2:10:03pm
     Author:  jd
 
   ==============================================================================
@@ -16,7 +16,7 @@ class ProcessorBase : public AudioProcessor
 {
 public:
 	//==============================================================================
-	ProcessorBase() 
+	ProcessorBase()
 		: AudioProcessor(BusesProperties()
 			.withInput("Input", AudioChannelSet::stereo(), true)
 			.withOutput("Output", AudioChannelSet::stereo(), true)) {}

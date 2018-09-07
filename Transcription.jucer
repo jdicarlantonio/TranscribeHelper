@@ -3,7 +3,23 @@
 <JUCERPROJECT id="ln7Ejm" name="Transcription" projectType="guiapp" jucerVersion="5.3.2">
   <MAINGROUP id="vcfeXO" name="Transcription">
     <GROUP id="{F43ED3C6-303A-3576-383A-C97653822515}" name="Source">
+      <GROUP id="{674907B0-4387-4E2F-09CC-48B458B96EB0}" name="FX">
+        <FILE id="IX7g8A" name="BiQuad.cpp" compile="1" resource="0" file="Source/FX/BiQuad.cpp"/>
+        <FILE id="mlY1Fh" name="BiQuad.h" compile="0" resource="0" file="Source/FX/BiQuad.h"/>
+        <FILE id="aSSKq3" name="Equalizer.cpp" compile="1" resource="0" file="Source/FX/Equalizer.cpp"/>
+        <FILE id="aAzc3u" name="Equalizer.h" compile="0" resource="0" file="Source/FX/Equalizer.h"/>
+        <FILE id="PSYmZX" name="InternalPlayer.cpp" compile="1" resource="0"
+              file="Source/FX/InternalPlayer.cpp"/>
+        <FILE id="MM0opR" name="InternalPlayer.h" compile="0" resource="0"
+              file="Source/FX/InternalPlayer.h"/>
+        <FILE id="MzFqdz" name="PluginManager.cpp" compile="1" resource="0"
+              file="Source/FX/PluginManager.cpp"/>
+        <FILE id="JkOP1e" name="PluginManager.h" compile="0" resource="0" file="Source/FX/PluginManager.h"/>
+        <FILE id="TeUDzR" name="ProcessorBase.h" compile="0" resource="0" file="Source/FX/ProcessorBase.h"/>
+      </GROUP>
       <GROUP id="{D9514024-BE92-B315-39CC-CB02DFB93045}" name="UI">
+        <FILE id="cfpjRU" name="PluginPanel.cpp" compile="1" resource="0" file="Source/UI/PluginPanel.cpp"/>
+        <FILE id="LmMklL" name="PluginPanel.h" compile="0" resource="0" file="Source/UI/PluginPanel.h"/>
         <FILE id="zwy3Mv" name="PositionOverlay.cpp" compile="1" resource="0"
               file="Source/UI/PositionOverlay.cpp"/>
         <FILE id="RX9NpW" name="PositionOverlay.h" compile="0" resource="0"
@@ -14,10 +30,6 @@
               file="Source/UI/TrackThumbnail.h"/>
         <FILE id="Kb3HhU" name="TrackUI.cpp" compile="1" resource="0" file="Source/UI/TrackUI.cpp"/>
         <FILE id="aAhRuZ" name="TrackUI.h" compile="0" resource="0" file="Source/UI/TrackUI.h"/>
-        <FILE id="m93NmM" name="DSPControlPanel.cpp" compile="1" resource="0"
-              file="Source/UI/DSPControlPanel.cpp"/>
-        <FILE id="XQ8svU" name="DSPControlPanel.h" compile="0" resource="0"
-              file="Source/UI/DSPControlPanel.h"/>
         <FILE id="ewufmK" name="SongControlPanel.cpp" compile="1" resource="0"
               file="Source/UI/SongControlPanel.cpp"/>
         <FILE id="gw35ih" name="SongControlPanel.h" compile="0" resource="0"
@@ -27,8 +39,7 @@
               file="Source/MainComponent.cpp"/>
       </GROUP>
       <FILE id="RZ6ciJ" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
-      <FILE id="Pp3gkh" name="ReferenceCountedBuffer.h" compile="0" resource="0"
-            file="Source/ReferenceCountedBuffer.h"/>
+      <FILE id="wc9Rqt" name="PluginWindow.h" compile="0" resource="0" file="Source/PluginWindow.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
@@ -52,6 +63,7 @@
         <MODULEPATH id="juce_audio_formats" path="../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../JUCE/modules"/>
         <MODULEPATH id="juce_audio_utils" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017">
@@ -74,6 +86,7 @@
         <MODULEPATH id="juce_audio_formats" path="..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_processors" path="..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_utils" path="..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_dsp" path="../../JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
@@ -96,6 +109,7 @@
         <MODULEPATH id="juce_audio_formats" path="../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../JUCE/modules"/>
         <MODULEPATH id="juce_audio_utils" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
   </EXPORTFORMATS>
@@ -108,6 +122,7 @@
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
@@ -118,5 +133,5 @@
   <LIVE_SETTINGS>
     <WINDOWS buildEnabled="0"/>
   </LIVE_SETTINGS>
-  <JUCEOPTIONS JUCE_USE_MP3AUDIOFORMAT="1"/>
+  <JUCEOPTIONS JUCE_USE_MP3AUDIOFORMAT="1" JUCE_PLUGINHOST_VST="1" JUCE_PLUGINHOST_VST3="1"/>
 </JUCERPROJECT>

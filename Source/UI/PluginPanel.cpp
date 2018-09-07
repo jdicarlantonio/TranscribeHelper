@@ -33,8 +33,6 @@ PluginPanel::PluginPanel()
 			String fxCode = "FX";
 			fxCode.append(String(i), 1);
 			fxCode.append(String(pluginSlots[i].getSelectedId()), 1);
-			
-			DBG("Hey");
 
 			sendActionMessage(fxCode);
 		};

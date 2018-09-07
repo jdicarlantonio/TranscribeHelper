@@ -50,6 +50,9 @@ void TrackThumbnail::paintWithoutFile(Graphics& g)
 {
 	g.fillAll(Colours::ghostwhite);
 
+	g.setColour (Colours::black);
+	g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+
 	g.setColour(Colours::black);
 	g.drawFittedText("No file loaded.", getLocalBounds(), Justification::centred, 1.0f);
 }
@@ -57,6 +60,9 @@ void TrackThumbnail::paintWithoutFile(Graphics& g)
 void TrackThumbnail::paintWithFile(Graphics& g)
 {
 	g.fillAll(Colours::ghostwhite);
+
+	g.setColour(Colours::black);
+	g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
 
 	g.setColour(Colours::black);
 	thumbnail.drawChannels(g, getLocalBounds(), 0.0, thumbnail.getTotalLength(), 1.0f);

@@ -19,6 +19,7 @@ MainComponent::MainComponent()
 	, looping(false)
 	, mainProcessor(new AudioProcessorGraph())
 	, audioPlayer(new InternalPlayer(transportSource))
+	, equalizer(new Equalizer())
 	, pluginManager("Plugins", Colours::ghostwhite)
 	, pluginFormatManager(new AudioPluginFormatManager())
 {
@@ -26,7 +27,8 @@ MainComponent::MainComponent()
 	{
 		thirdPartyPlugins[i] = nullptr;
 		builtInPlugins[i] = nullptr;
-		slotOccupied[i] = 0;
+		occupiedSlots[i] = false;
+		activePluginWindows.add(nullptr);
 	}
 
 	addAndMakeVisible(controlPanel);
@@ -58,7 +60,7 @@ MainComponent::MainComponent()
 */
 //	player.setProcessor(mainProcessor.get());
 
-	setAudioChannels (2, 2);
+	setAudioChannels (0, 2);
 }
 
 MainComponent::~MainComponent()
@@ -135,6 +137,7 @@ void MainComponent::releaseResources()
 
 	mainProcessor->releaseResources();
 	audioPlayer.release();
+	equalizer.release();
 	transportSource.releaseResources();
 }
 
@@ -451,26 +454,19 @@ void MainComponent::updateGraph()
 {
 	ReferenceCountedArray<Node> activeNodes; 
 
-	for (int i = 0; i < totalPluginsAllowed; ++i)
+	if(builtInPlugins[slotNumber])
 	{
-		if (thirdPartyPlugins[i] != nullptr)
-		{
-			activeNodes.add(thirdPartyPlugins[i]);
-		}
-		if(builtInPlugins[i] != nullptr)
-		{
-			activeNodes.add(builtInPlugins[i]);
-		}
+		removePlugin();
 	}
 
-	// remove and add some connections
-	for(int channel = 0; channel < 2; ++channel)
-	{
-		if(!graphHasPlugins)
-		{
-			// this should only happen when there is one unconnected plugin in the activeNodes array
-			// so using the getFirst() function might work, but i guess i'll find out soon enough
+	Node::Ptr currentNode = builtInPlugins[slotNumber];
 
+	bool otherPluginsInChain = checkForOtherPlugins();
+
+	if(!otherPluginsInChain)
+	{
+		for (int channel = 0; channel < 2; ++channel)
+		{
 			mainProcessor->removeConnection({
 				{ audioPlaybackNode->nodeID, channel },
 				{ audioOutputNode->nodeID, channel }
@@ -478,57 +474,82 @@ void MainComponent::updateGraph()
 
 			mainProcessor->addConnection({
 				{ audioPlaybackNode->nodeID, channel },
-				{ activeNodes.getFirst()->nodeID, channel }
+				{ currentNode->nodeID, channel }
 			});
 
 			mainProcessor->addConnection({
-				{ activeNodes.getFirst()->nodeID, channel },
+				{ currentNode->nodeID, channel },
 				{ audioOutputNode->nodeID, channel }
 			});
 		}
+	}
+	else
+	{
+		int nextOccupiedSlot;
+		int previousOccupiedSlot;
+
+		checkForNextOccupiedSlots(nextOccupiedSlot, previousOccupiedSlot);
+
+		if(nextOccupiedSlot >= 0 && previousOccupiedSlot >= 0)
+		{
+			for (int channel = 0; channel < 2; ++channel)
+			{
+				mainProcessor->removeConnection({
+					{ builtInPlugins[previousOccupiedSlot]->nodeID, channel },
+					{ builtInPlugins[nextOccupiedSlot]->nodeID, channel }
+				});
+
+				mainProcessor->addConnection({
+					{ builtInPlugins[previousOccupiedSlot]->nodeID, channel },
+					{ currentNode->nodeID, channel }
+				});
+
+				mainProcessor->addConnection({
+					{ currentNode->nodeID, channel },
+					{ builtInPlugins[nextOccupiedSlot]->nodeID, channel }
+				});
+			}
+		}
 		else
 		{
-			for(int i = 0; i < activeNodes.size() - 1; ++i)
+			if (previousOccupiedSlot == -1)
 			{
-				if(!(mainProcessor->isConnected(activeNodes[i]->nodeID, activeNodes[i + 1]->nodeID)))
+				for (int channel = 0; channel < 2; ++channel)
 				{
-					if(mainProcessor->isConnected(activeNodes[i]->nodeID, audioOutputNode->nodeID))
-					{
-						mainProcessor->removeConnection({
-							{activeNodes[i]->nodeID, channel},
-							{audioOutputNode->nodeID, channel}
-						});
+					mainProcessor->removeConnection({
+						{ audioPlaybackNode->nodeID, channel },
+						{ builtInPlugins[nextOccupiedSlot]->nodeID, channel }
+					});
 
-						mainProcessor->addConnection({
-							{ activeNodes[i]->nodeID, channel },
-							{ activeNodes[i + 1]->nodeID, channel }
-						});
+					mainProcessor->addConnection({
+						{ audioPlaybackNode->nodeID, channel },
+						{ currentNode->nodeID, channel }
+					});
 
-						mainProcessor->addConnection({
-							{ activeNodes[i + 1]->nodeID, channel },
-							{ audioOutputNode->nodeID, channel }
-						});
-					}
-					else if(mainProcessor->isConnected(activeNodes[i + i]->nodeID, audioOutputNode->nodeID))
-					{
-						if(mainProcessor->isConnected(audioPlaybackNode->nodeID, activeNodes[i + 1]->nodeID))
-						{
-							mainProcessor->removeConnection({
-								{audioPlaybackNode->nodeID, channel},
-								{activeNodes[i + 1]->nodeID, channel}
-							});
+					mainProcessor->addConnection({
+						{ currentNode->nodeID, channel },
+						{ builtInPlugins[nextOccupiedSlot]->nodeID, channel }
+					});
+				}
+			}
+			if (nextOccupiedSlot == -1)
+			{
+				for (int channel = 0; channel < 2; ++channel)
+				{
+					mainProcessor->removeConnection({
+						{ builtInPlugins[previousOccupiedSlot]->nodeID, channel },
+						{ audioOutputNode->nodeID, channel }
+					});
 
-							mainProcessor->addConnection({
-								{audioPlaybackNode->nodeID, channel},
-								{activeNodes[i]->nodeID, channel}
-							});
+					mainProcessor->addConnection({
+						{ builtInPlugins[previousOccupiedSlot]->nodeID, channel },
+						{ currentNode->nodeID, channel }
+					});
 
-							mainProcessor->addConnection({
-								{ activeNodes[i]->nodeID, channel },
-								{ activeNodes[i + 1]->nodeID, channel }
-							});
-						}
-					}
+					mainProcessor->addConnection({
+						{ currentNode->nodeID, channel },
+						{ audioOutputNode->nodeID, channel }
+					});
 				}
 			}
 		}
@@ -546,37 +567,225 @@ void MainComponent::loadPlugin(String fxCode)
 {
 	slotNumber = fxCode[2] - '0';
 
-	if(fxCode.endsWithChar('5'))
-	{
-		
-	}
+	String numChoicesStr(pluginPanel.numChoices());
 
-	if(fxCode.endsWithChar('1'))
+	if(fxCode.endsWith(numChoicesStr))
 	{
-		// 3rd party plugin requested
-		pluginManager.setVisible(true);
-		if(!pluginDirScanned)
+		// none selected either delete current node or do nothing
+
+		// check if there is actually a plugin
+		if(builtInPlugins[slotNumber])
 		{
-			if(pluginManager.addAndScanDirectory())
-			{
-				pluginManager.update();
+			activePluginWindows.remove(slotNumber, true);
 
-				pluginDirScanned = true;
-			}
-			else 
-			{
-				AlertWindow::showMessageBox(
-					AlertWindow::WarningIcon,
-					"No Plugins Found",
-					"No plugins were found.\nPlease scan another directory.",
-					"Ok"
-				);
-			}
+			removePlugin();
+
+			mainProcessor->removeNode(builtInPlugins[slotNumber]);
 		}
 	}
 	else
 	{
-		// load built in plugin
-		slotOccupied[slotNumber] = true;
+		if(fxCode.endsWithChar('1'))
+		{
+			// 3rd party plugin requested
+
+			AlertWindow::showMessageBox(
+				AlertWindow::WarningIcon,
+				"Wait...",
+				"This feature has not been implemented yet.",
+				"Ok"
+			);
+
+			/*
+			pluginManager.setVisible(true);
+			if(!pluginDirScanned)
+			{
+				if(pluginManager.addAndScanDirectory())
+				{
+					pluginManager.update();
+
+					pluginDirScanned = true;
+				}
+				else 
+				{
+					AlertWindow::showMessageBox(
+						AlertWindow::WarningIcon,
+						"No Plugins Found",
+						"No plugins were found.\nPlease scan another directory.",
+						"Ok"
+					);
+				}
+			}
+			*/
+		}
+		else
+		{
+			// load built in plugin
+
+			if(fxCode.endsWithChar('2')) // eq
+			{
+				builtInPlugins[slotNumber] = mainProcessor->addNode(equalizer.get());
+			}
+
+			updateGraph();
+
+			activePluginWindows.insert(slotNumber, new PluginWindow(
+				builtInPlugins[slotNumber],
+				PluginWindow::Type::generic,
+				activePluginWindows
+			));
+		}
+	}
+}
+
+void MainComponent::removePlugin()
+{
+	Node::Ptr currentNode = builtInPlugins[slotNumber];
+
+	// index of the slots between the current slot
+	int nextOccupiedSlot = -1;
+	int previousOccupiedSlot = -1;
+
+	bool otherPluginsInChain = checkForOtherPlugins();
+
+	if(!otherPluginsInChain)
+	{
+		for(int channel = 0; channel < 2; ++channel)
+		{
+			mainProcessor->removeConnection({
+				{ audioPlaybackNode->nodeID, channel },
+				{ currentNode->nodeID, channel }
+			});
+
+			mainProcessor->removeConnection({
+				{ currentNode->nodeID, channel },
+				{ audioOutputNode->nodeID, channel }
+			});
+
+			mainProcessor->addConnection({
+				{ audioPlaybackNode->nodeID, channel },
+				{ audioOutputNode->nodeID, channel }
+			});
+		}
+	}
+	else
+	{
+		for(int slotsAfter = slotNumber + 1; slotsAfter < totalPluginsAllowed; ++slotsAfter)
+		{
+			if(builtInPlugins[slotsAfter])
+			{
+				nextOccupiedSlot = slotsAfter;
+			}
+		}
+
+		for(int slotsBefore = slotNumber - 1; slotsBefore >= 0; --slotsBefore)
+		{
+			if(builtInPlugins[slotsBefore])
+			{
+				previousOccupiedSlot = slotsBefore;
+			}
+		}
+
+		if(previousOccupiedSlot >= 0 && nextOccupiedSlot >= 0)
+		{
+			for (int channel = 0; channel < 2; ++channel)
+			{
+				mainProcessor->removeConnection({
+					{ builtInPlugins[previousOccupiedSlot]->nodeID, channel },
+					{ currentNode->nodeID, channel }
+				});
+
+				mainProcessor->removeConnection({
+					{ currentNode->nodeID, channel },
+					{ builtInPlugins[nextOccupiedSlot]->nodeID, channel }
+				});
+
+				mainProcessor->addConnection({
+					{ builtInPlugins[previousOccupiedSlot]->nodeID, channel },
+					{ builtInPlugins[nextOccupiedSlot]->nodeID, channel }
+				});
+			}
+		}
+		else
+		{
+			if(previousOccupiedSlot == -1)
+			{
+				for (int channel = 0; channel < 2; ++channel)
+				{
+					mainProcessor->removeConnection({
+						{ audioPlaybackNode->nodeID, channel },
+						{ currentNode->nodeID, channel }
+					});
+
+					mainProcessor->removeConnection({
+						{ currentNode->nodeID, channel },
+						{ builtInPlugins[nextOccupiedSlot]->nodeID, channel }
+					});
+
+					mainProcessor->addConnection({
+						{ audioPlaybackNode->nodeID, channel },
+						{ builtInPlugins[nextOccupiedSlot]->nodeID, channel }
+					});
+				}
+			}
+			if(nextOccupiedSlot == -1)
+			{
+				for (int channel = 0; channel < 2; ++channel)
+				{
+					mainProcessor->removeConnection({
+						{ builtInPlugins[previousOccupiedSlot]->nodeID, channel },
+						{ currentNode->nodeID, channel }
+					});
+
+					mainProcessor->removeConnection({
+						{ currentNode->nodeID, channel },
+						{ audioOutputNode->nodeID, channel }
+					});
+
+					mainProcessor->addConnection({
+						{ builtInPlugins[previousOccupiedSlot]->nodeID, channel },
+						{ audioOutputNode->nodeID, channel }
+					});
+				}
+			}
+		}
+	}
+}
+
+bool MainComponent::checkForOtherPlugins()
+{
+	bool pluginsInChain = false;
+	for (int i = 0; i < totalPluginsAllowed; ++i)
+	{
+		if (i == slotNumber) continue;
+
+		if (occupiedSlots[i])
+		{
+			pluginsInChain = true;
+		}
+	}
+
+	return pluginsInChain;
+}
+
+void MainComponent::checkForNextOccupiedSlots(int& nextOccupied, int& previousOccupied)
+{
+	previousOccupied = -1;
+	nextOccupied = -1;
+
+	for (int slotsAfter = slotNumber + 1; slotsAfter < totalPluginsAllowed; ++slotsAfter)
+	{
+		if(builtInPlugins[slotsAfter])
+		{
+			nextOccupied = slotsAfter;
+		}
+	}
+
+	for (int slotsBefore = slotNumber - 1; slotsBefore >= 0; --slotsBefore)
+	{
+		if(builtInPlugins[slotsBefore])
+		{
+			previousOccupied = slotsBefore;
+		}
 	}
 }

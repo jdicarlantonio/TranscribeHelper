@@ -15,18 +15,15 @@
 #include "UI/TrackUI.h"
 #include "UI/PositionOverlay.h"
 #include "UI/PluginPanel.h"
+#include "PluginWindow.h"
 
 // built in effects
 #include "FX/InternalPlayer.h"
+#include "FX/Equalizer.h"
 
 // for plugin support
 #include "FX/PluginManager.h"
 
-//==============================================================================
-/*
-	This component lives inside our window, and this is where you should put all
-	your controls and content.
-*/
 class MainComponent   
 	: public AudioAppComponent
 	, public ActionListener
@@ -78,6 +75,9 @@ private:
 	void connectAudioNodes();
 	void updateGraph();
 	void loadPlugin(String fxCode);
+	void removePlugin();
+	bool checkForOtherPlugins();
+	void checkForNextOccupiedSlots(int& nextOccupied, int& previousOccupied);
 
 private:
 	// store an array and single instance of a reference counted audio buffer
@@ -115,8 +115,13 @@ private:
 	std::unique_ptr<AudioProcessorGraph> mainProcessor;
 	bool graphHasPlugins { false };
 
-	// internal plugin for audio file playback
+	// internal plugin for audio playback
 	std::unique_ptr<InternalPlayer> audioPlayer;
+
+	// built in effects
+
+	// TODO: hold effects in an owned array to allow for multiple instances on same chain
+	std::unique_ptr<Equalizer> equalizer;
 
 //	AudioProcessorPlayer player;
 
@@ -124,16 +129,11 @@ private:
 	Node::Ptr audioPlaybackNode;
 	Node::Ptr audioOutputNode;
 
-	// should keep track of which slot occupies a third party plugin
+	// keep track of occupied slots
 	Node::Ptr thirdPartyPlugins[totalPluginsAllowed]; 
 	Node::Ptr builtInPlugins[totalPluginsAllowed];
 
-	// should indicate which slot is a built in effect
-	bool slotOccupied[totalPluginsAllowed];
-
-	Node::Ptr currentLoadedPlugin;
-//	OwnedArray<Node::Ptr> pluginNodes;
-//	OwnedArray<AudioProcessorEditor> pluginNodeEditors;
+	OwnedArray<Node::Ptr> pluginNodes;
 	
 	Node::Ptr midiInputNode;
 	Node::Ptr midiOutputNode;
@@ -141,6 +141,9 @@ private:
 	// plugin UI
 	PluginPanel pluginPanel;
 	int slotNumber;
+	std::array<bool, totalPluginsAllowed> occupiedSlots;
+
+	OwnedArray<PluginWindow> activePluginWindows;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
