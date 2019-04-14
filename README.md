@@ -2,7 +2,7 @@
 
 This is a simple application that can be used to help with transcribing parts of a song. Basically it loads a single audio file which can be processed. It also has functionality to loop through different sections. I made this mostly for transcribing guitar solos so initially all I wanted was a way to slow down the tempo and center in on some frequencies. This may continue into something more useful after I have learned a bit more, but maybe not.
 
-Built entirely in JUCE.
+Built using the JUCE framework.
 
 ### Built-in Effects
 
