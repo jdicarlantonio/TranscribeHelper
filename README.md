@@ -13,4 +13,7 @@ Current plans for FX:
 * Four band equalizer with a low/high pass and one peak filter (implemented)
 * Phase Vocoder for pitch shifting and time stretching (TODO) note: also considering using granular synthesis for this
 
+### TODO:
+Right now this does not build with newer versions of JUCE. Needs to be updated.
+
 
