@@ -8,8 +8,8 @@ Built using the JUCE framework.
 
 ### Built-in Effects
 
-The built-in effects (not pictured) are built as plugins which uses the GenericAudioProcessorEditor class for the GUI. So you just get a bunch of sliders and stuff.
+The built-in effects included are an equalizer and time-stretch. Third party plugins will also be supported (in progress).
 
 ### In Progress
 
-Currently porting this to use the newest version of JUCE. The UI and playing tracks is fully functional, but a lot of the effects code is now unsupported.
+Currently porting this to use the newest version of JUCE. The UI and playing/looping tracks is fully functional, but a lot of the effects code is now unsupported.
