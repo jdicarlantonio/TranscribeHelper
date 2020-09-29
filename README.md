@@ -8,9 +8,4 @@ Built using the JUCE framework.
 
 The built-in effects are built as plugins which uses the GenericAudioProcessorEditor class for the GUI. So you just get a bunch of sliders and stuff.
 
-Current plans for FX:
-
-* Four band equalizer with a low/high pass and one peak filter (implemented)
-* Phase Vocoder for pitch shifting and time stretching (TODO) note: also considering using granular synthesis for this
-
-
+![ScreenShot](https://raw.githubusercontent.com/jdicarlantonio/TranscribeHelper/master/Screenshot/transcribeScreenshot.png)
